@@ -14,17 +14,16 @@ int main()
 		v.resize(10);
 		
 
-		v[0] = 1;
+		v.push_back(1);
+		v.push_back(2);
+		v.push_back(3);
+		v.push_back(4);
 
-		ptr = &v[0];
+		for(auto &i : v)
+		{
+			std::cout << i;
+		}
 
-		std::cout << v[0] << "\n";
-
-		v.resize(1200);
-
-		PinnedVector<int> v3 = std::move(v);
-
-		std::cout << v3[0] << "\n";
 		
 	}
 
