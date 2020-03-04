@@ -61,18 +61,20 @@ struct PinnedVector
 	PinnedVector(PinnedVector &other)
 	{
 		initializeArena();
-		resize(other.size);
+		unsafeResize(other.size);
 
 		memcpy(beg, other.beg, size * sizeof(T));
 	}
 
 	void initializeArena();
 
+	void unsafeResize(unsigned int elementCount);
+
 	void resize(unsigned int elementCount);
 
 	PinnedVector &operator= (const PinnedVector& other)
 	{
-		this->resize(other.size);
+		this->unsafeResize(other.size);
 		memcpy(beg, other.beg, size * sizeof(T));
 		return *this;
 	}
@@ -120,7 +122,7 @@ inline void PinnedVector<T, maxElCount>::initializeArena()
 }
 
 template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::resize(unsigned int elementCount)
+inline void PinnedVector<T, maxElCount>::unsafeResize(unsigned int elementCount)
 {
 	if(!beg)
 	{
@@ -133,15 +135,42 @@ inline void PinnedVector<T, maxElCount>::resize(unsigned int elementCount)
 		size = elementCount;
 	}else 
 	{
-		elementCount = size;
+		size = elementCount;
 	}
 
 }
 
 template<class T, unsigned int maxElCount>
+inline void PinnedVector<T, maxElCount>::resize(unsigned int elementCount)
+{
+	if (!beg)
+	{
+		initializeArena();
+	}
+
+	if (elementCount > size)
+	{
+		VirtualAlloc(beg, elementCount * sizeof(T), MEM_COMMIT, PAGE_READWRITE);
+		for(int i=size; i<elementCount; i++)
+		{
+			beg[i] = T();
+		}
+		size = elementCount;
+	}
+	else
+	{
+		for (int i = elementCount; i < size; i++)
+		{
+			beg[i].~T();
+		}
+		elementCount = size;
+	}
+}
+
+template<class T, unsigned int maxElCount>
 inline void PinnedVector<T, maxElCount>::push_back(const T & el)
 {
-	resize(size + 1);
+	unsafeResize(size + 1);
 	beg[size - 1] = el;
 }
 
@@ -150,26 +179,32 @@ inline void PinnedVector<T, maxElCount>::pop_back()
 {
 	///todo
 	beg[size - 1].~T();
-	resize(size - 1);
+	unsafeResize(size - 1);
 }
 
 template<class T, unsigned int maxElCount>
 inline void PinnedVector<T, maxElCount>::free()
 {
 
+	for (int i = 0; i < size; i++)
+	{
+		beg[i].~T();
+	}
+
 #ifdef PINNED_VECTOR_MEMORY_CHECK
 
 	if (beg)
 	{
 		//VirtualFree(beg, maxElCount * sizeof(T), MEM_DECOMMIT);
-		VirtualAlloc(beg, sizeof(T) * maxElCount, MEM_COMMIT, PAGE_NOACCESS);
+		DWORD last;
+		VirtualProtect(beg, sizeof(T) * maxElCount, PAGE_NOACCESS, &last);
 	}
 
 #else
 
 	if (beg)
 	{
-		VirtualFree(beg, maxElCount * sizeof(T), MEM_RELEASE);
+		VirtualFree(beg, 0, MEM_RELEASE);
 	}
 
 	size = 0;
