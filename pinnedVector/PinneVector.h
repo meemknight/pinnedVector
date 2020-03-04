@@ -5,9 +5,14 @@
 // /////////////////
 // Pinned vector
 // Define PINNED_VECTOR_MEMORY_CHECK to check if acces deleted memory areas
-// 
-//
+// Define _DEBUG to check in bounds acces
+// https://github.com/meemknight/pinnedVector
+// licensed under MIT license, do not remove this notice https://github.com/meemknight/pinnedVector/blob/master/LICENSE
+// /////////////////
 
+
+// this check does not release memory, but rather ivalidates it so it would
+// fail on acces. Can consume a lot of memory due to this reason
 //#define PINNED_VECTOR_MEMORY_CHECK
 
 #ifdef _DEBUG
@@ -21,8 +26,6 @@
 #define PINNED_VECTOR_ASSERT(x) 
 
 #endif // DEBUG
-
-
 
 
 template <class T, unsigned int maxElCount = 12000>
@@ -197,7 +200,7 @@ inline void PinnedVector<T, maxElCount>::free()
 	{
 		//VirtualFree(beg, maxElCount * sizeof(T), MEM_DECOMMIT);
 		DWORD last;
-		VirtualProtect(beg, sizeof(T) * maxElCount, PAGE_NOACCESS, &last);
+		VirtualProtect(beg, sizeof(T) * size, PAGE_NOACCESS, &last);
 	}
 
 #else
