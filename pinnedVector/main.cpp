@@ -44,9 +44,29 @@ int main()
 
 	int *ptr;
 
-	system("pause");
 
-	for (int i = 0; i < 1000000; i++)
+	for (int i = 0; i < 10000; i++)
+	{
+		{
+			PinnedVector<Test> v;
+
+			v.resize(1);
+		
+			v.push_back({});
+			v.push_back({});
+			v.push_back({});
+			v.push_back({});
+			v.pop_back();
+			
+			v.resize(15);
+			//
+
+		}
+
+	}
+
+
+	for (int i = 0; i < 10000; i++)
 	{
 		{
 			PinnedVector<std::string> v;
@@ -76,7 +96,6 @@ int main()
 
 	}
 
-	system("pause");
 
 
 	std::cout << "counter: " << counter << "\ntotal: " << totalCounter;

@@ -64,14 +64,14 @@ struct PinnedVector
 	PinnedVector(PinnedVector &other)
 	{
 		initializeArena();
-		unsafeResize(other.size_);
+		noConstructorCallResize(other.size_);
 
 		memcpy(beg, other.beg, size_ * sizeof(T));
 	}
 
 	void initializeArena();
 
-	void unsafeResize(unsigned int elementCount);
+	void noConstructorCallResize(unsigned int elementCount);
 
 	void resize(unsigned int elementCount);
 
@@ -83,7 +83,7 @@ struct PinnedVector
 
 	PinnedVector &operator= (const PinnedVector& other)
 	{
-		this->unsafeResize(other.size_);
+		this->noConstructorCallResize(other.size_);
 		memcpy(beg, other.beg, size_ * sizeof(T));
 		return *this;
 	}
@@ -131,7 +131,7 @@ inline void PinnedVector<T, maxElCount>::initializeArena()
 }
 
 template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::unsafeResize(unsigned int elementCount)
+inline void PinnedVector<T, maxElCount>::noConstructorCallResize(unsigned int elementCount)
 {
 	if(!beg)
 	{
@@ -192,7 +192,7 @@ inline T * PinnedVector<T, maxElCount>::data()
 template<class T, unsigned int maxElCount>
 inline void PinnedVector<T, maxElCount>::push_back(const T & el)
 {
-	unsafeResize(size_ + 1);
+	noConstructorCallResize(size_ + 1);
 	beg[size_ - 1] = el;
 }
 
@@ -201,7 +201,7 @@ inline void PinnedVector<T, maxElCount>::pop_back()
 {
 	///todo
 	beg[size_ - 1].~T();
-	unsafeResize(size_ - 1);
+	noConstructorCallResize(size_ - 1);
 }
 
 template<class T, unsigned int maxElCount>
