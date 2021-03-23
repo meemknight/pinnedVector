@@ -1,5 +1,10 @@
 #include <iostream>
+#include <algorithm>
+
+//#define PINNED_VECTOR_MEMORY_CHECK
+
 #include "PinneVector.h"
+
 #include <vector>
 
 int counter = 0;
@@ -23,7 +28,7 @@ struct Test
 	Test operator=(Test &&other)
 	{
 		a = 69;
-		hasData = 1;
+		hasData = other.hasData;
 		other.hasData = 0;
 		return *this;
 	}
@@ -42,8 +47,30 @@ struct Test2
 int main()
 {
 
-	int *ptr;
 
+	PinnedVector<int> vInt;
+	vInt.push_back(5);
+	vInt.push_back(4);
+	vInt.push_back(10);
+	vInt.push_back(3);
+	vInt.push_back(2);
+	vInt.push_back(6);
+	vInt.push_back(9);
+	vInt.push_back(1);
+	vInt.push_back(8);
+	vInt.push_back(7);
+
+	std::sort(vInt.begin(), vInt.end());
+
+	std::cout << "Sort test:\n";
+
+	for(auto &i : vInt)
+	{
+		std::cout << i << " ";
+	}
+
+	std::cout << "\n\n";
+	vInt.clear();
 
 	for (int i = 0; i < 10000; i++)
 	{
@@ -61,11 +88,25 @@ int main()
 			v.resize(15);
 			//
 
+			auto i1 = v.top();
+			auto &i2 = v.top();
+			const auto i3 = v.top();
+			const auto &i4 = v.top();
+
+			Test t;
+			v.push_back(std::move(t));
+			v.push_back(std::move(t));
+		
+			v.pop_back();
+			v.pop_back();
+			v.pop_back();
+			v.pop_back();
 		}
+
 
 	}
 
-
+	//test on stl data types
 	for (int i = 0; i < 10000; i++)
 	{
 		{
@@ -81,7 +122,7 @@ int main()
 			//v.push_back({});
 			//v.push_back({});
 			//v.push_back({});
-			//v.pop_back();
+			v.pop_back();
 			v.resize(15);
 			//
 			v[4] = "new test ------------------------------------------";
@@ -92,13 +133,14 @@ int main()
 				//std::cout << i.c_str() << "\n";
 			}
 
+
+
 		}
 
 	}
 
 
-
-	std::cout << "counter: " << counter << "\ntotal: " << totalCounter;
+	std::cout << "counter (non zero means leaks): " << counter << "\ntotal: " << totalCounter;
 
 	std::cin.get();
 	return 0;
