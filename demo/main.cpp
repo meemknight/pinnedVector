@@ -100,5 +100,6 @@ int main()
 
 	std::cout << "counter: " << counter << "\ntotal: " << totalCounter;
 
+	std::cin.get();
 	return 0;
 }
