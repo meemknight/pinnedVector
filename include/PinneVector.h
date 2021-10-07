@@ -1,14 +1,12 @@
 #pragma once
-#include <Windows.h>
-#include <assert.h>
-#include <type_traits>
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Pinned vector 1.0
-// Define PINNED_VECTOR_MEMORY_CHECK to check if acces deleted memory areas
+// Define PINNED_VECTOR_MEMORY_CHECK to check if acces deleted memory areas (not working yet)
 // Define PINNED_VECTOR_BOUNDS_CHECK to check in bounds acces
 // https://github.com/meemknight/pinnedVector
 // licensed under MIT license, do not remove this notice https://github.com/meemknight/pinnedVector/blob/master/LICENSE
+// Luta Vlad 2021
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -34,6 +32,8 @@
 
 #ifdef PINNED_VECTOR_BOUNDS_CHECK
 
+//you can use your own assert function here if you want.
+//it is used to check if the vector gets out of bounds
 #define PINNED_VECTOR_ASSERT(x) assert(x)
 
 #else
@@ -42,12 +42,53 @@
 
 #endif
 
+//you can use your own assert function here if you want.
+//it is used to check if the allocations fail
 #define PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(x) assert(x)
 
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+//code
 
-//maxElCount is the maximum number of elements that the vector can store.
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#define PINNED_VECTOR_WIN
+#elif defined(__linux__) && !defined(__ANDROID__)
+#define PINNED_VECTOR_LINUX
+#else
+#error pinned vector supports only windows and linux
+#endif
+
+
+
+#ifdef PINNED_VECTOR_WIN
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
+#include <assert.h>
+#include <type_traits>
+
+
+
+#ifdef PINNED_VECTOR_WIN
+	
+	#define PINNED_VECTOR_RESERVE_MEMORY(size)\
+			VirtualAlloc(0, (size), MEM_RESERVE, PAGE_READWRITE)
+	
+	#define PINNED_VECTOR_COMMIT_MEMORY(beg, size)\
+			VirtualAlloc((beg), (size), MEM_COMMIT, PAGE_READWRITE)
+	
+	#define PINNED_VECTOR_FREE_MEMORY(beg)\
+			VirtualFree((beg), 0, MEM_RELEASE)
+
+
+#else
+
+#endif
+
+
+//maxElCount is the maximum number of ELEMENTS that the vector can store.
 template <class T, unsigned int maxElCount = 12000>
 struct PinnedVector
 {
@@ -166,8 +207,6 @@ struct PinnedVector
 	void free();
 
 	~PinnedVector();
-
-
 };
 
 template<class T, unsigned int maxElCount>
@@ -178,7 +217,7 @@ inline void PinnedVector<T, maxElCount>::initializeArena()
 		free();
 	}
 
-	beg_ = (T*)VirtualAlloc(0, sizeof(T) * maxElCount, MEM_RESERVE, PAGE_READWRITE);
+	beg_ = (T*)PINNED_VECTOR_RESERVE_MEMORY(sizeof(T) * maxElCount);
 	PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(beg_);
 
 }
@@ -193,7 +232,7 @@ inline void PinnedVector<T, maxElCount>::noConstructorCallResize(size_t elementC
 
 	if(elementCount > size_)
 	{
-		auto check = VirtualAlloc(beg_, elementCount * sizeof(T), MEM_COMMIT, PAGE_READWRITE);
+		auto check = PINNED_VECTOR_COMMIT_MEMORY((beg_), (elementCount * sizeof(T)));
 		PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(check);
 		size_ = elementCount;
 	}
@@ -214,7 +253,7 @@ inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
 
 	if (elementCount > size_)
 	{
-		auto check = VirtualAlloc(beg_, elementCount * sizeof(T), MEM_COMMIT, PAGE_READWRITE);
+		auto check = PINNED_VECTOR_COMMIT_MEMORY((beg_), (elementCount * sizeof(T)));
 		PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(check);
 
 		for(int i=size_; i<elementCount; i++)
@@ -240,7 +279,7 @@ inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
 template<class T, unsigned int maxElCount>
 inline void PinnedVector<T, maxElCount>::reserve(size_t elementCount)
 {
-	auto check = VirtualAlloc(beg_, elementCount * sizeof(T), MEM_COMMIT, PAGE_READWRITE);
+	auto check = PINNED_VECTOR_COMMIT_MEMORY((beg_), (elementCount * sizeof(T)));
 	PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(check);
 
 }
@@ -315,7 +354,7 @@ inline void PinnedVector<T, maxElCount>::free()
 
 	if (beg_)
 	{
-		VirtualFree(beg_, 0, MEM_RELEASE);
+		PINNED_VECTOR_FREE_MEMORY(beg_);
 	}
 
 	size_ = 0;

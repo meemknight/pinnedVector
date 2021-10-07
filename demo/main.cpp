@@ -7,9 +7,10 @@
 
 #include <vector>
 
+//todo add a compare with a standard container like vector
+
 int counter = 0;
 int totalCounter = 0;
-
 struct Test
 {
 	Test() { counter++; totalCounter++; hasData = 1; a = 69; }
