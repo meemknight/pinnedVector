@@ -45,9 +45,12 @@ struct Test2
 	//int x = 420;
 };
 
+std::string data[10] = {};
+
 int main()
 {
 
+	std::cout << "Starting program:\n";
 
 	PinnedVector<int> vInt;
 	vInt.push_back(5);
@@ -107,6 +110,11 @@ int main()
 
 	}
 
+	PinnedVector<std::string> test;
+	//test.resize(1);
+	//test.push_back("lolsdfghjhgfdsderftyhjsadfghjhgfdsasdfghjhgfdsafg");
+	test.push_back({});
+
 	//test on stl data types
 	for (int i = 0; i < 10000; i++)
 	{
@@ -114,15 +122,15 @@ int main()
 			PinnedVector<std::string> v;
 
 			v.resize(1);
+			v.push_back("test ------------------------------------------ --- ");
+			v.push_back("test ------------------------------------------ --- ");
+			v.push_back("test ------------------------------------------ --- ");
+			v.push_back("test ------------------------------------------ --- ");
+			v.push_back("");
 			v.push_back({});
-			v.push_back("test ------------------------------------------ --- ");
-			v.push_back("test ------------------------------------------ --- ");
-			v.push_back("test ------------------------------------------ --- ");
-			v.push_back("test ------------------------------------------ --- ");
 			v.push_back({});
-			//v.push_back({});
-			//v.push_back({});
-			//v.push_back({});
+			v.push_back({});
+			v.push_back({});
 			v.pop_back();
 			v.resize(15);
 			//
