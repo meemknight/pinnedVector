@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
-project(pinnedVector)
+project(pinnedVectorTest)
 
-
-add_library(pinnedVector INTERFACE)
-target_include_directories(pinnedVector INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-
+add_subdirectory(pinnedVector)
 
 #Define PROFILER_LIB_SOURCES to be a list of all the source files for the test 
 file(GLOB_RECURSE PROFILER_LIB_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/demo/*.cpp")

@@ -310,9 +310,7 @@ inline void PinnedVector<T, maxElCount>::push_back(const T & el)
 {
 	noConstructorCallResize(size_ + 1);
 	new(&beg_[size_ - 1])T(el);
-
 	//new(&beg_[size_ - 1])T(std::forward<T>(el));
-	//beg_[size_ - 1] = el;
 }
 
 template<class T, unsigned int maxElCount>
@@ -321,7 +319,6 @@ inline void PinnedVector<T, maxElCount>::push_back(T &&el)
 	noConstructorCallResize(size_ + 1);
 	new(&beg_[size_ - 1])T(el);
 	//new(&beg_[size_ - 1])T(std::forward<T>(el));
-	//beg_[size_ - 1] = el;
 
 }
 

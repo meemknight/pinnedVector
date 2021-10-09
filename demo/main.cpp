@@ -3,7 +3,7 @@
 
 //#define PINNED_VECTOR_MEMORY_CHECK
 
-#include "PinneVector.h"
+#include "PinnedVector.h"
 
 #include <vector>
 
@@ -17,17 +17,23 @@ struct Test
 	Test(Test &other) { counter++; totalCounter++; hasData = 1; a = 69; }
 	Test(Test &&other) { hasData = 1; other.hasData = 0; a = 69; }
 
-	~Test() { if (hasData) { counter--; a = 69; } }
+	~Test() { if (hasData) { counter--; a = 69; hasData = 0; } }
 
-	Test operator=(const Test &other)
+	Test &operator=(const Test &other)
 	{
+		if (this == &other) { return *this; }
+
+		this->~Test();
 		a = 69;
 		counter++; totalCounter++; hasData = 1;
 		return *this;
 	}
 
-	Test operator=(Test &&other)
+	Test &operator=(Test &&other)
 	{
+		if (this == &other) { return *this; }
+
+		this->~Test();
 		a = 69;
 		hasData = other.hasData;
 		other.hasData = 0;
