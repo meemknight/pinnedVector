@@ -1,7 +1,7 @@
 #pragma once
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Pinned vector 1.1
+// Pinned vector 1.2
 // Define PINNED_VECTOR_MEMORY_CHECK to check if acces deleted memory areas (not working yet)
 // Define PINNED_VECTOR_BOUNDS_CHECK to check in bounds acces
 // https://github.com/meemknight/pinnedVector
@@ -15,7 +15,7 @@
 // It checks if you acces outside the array
 /////////////////////////////////////////////
 #ifdef _DEBUG
-	#define PINNED_VECTOR_BOUNDS_CHECK
+#define PINNED_VECTOR_BOUNDS_CHECK
 #endif
 
 //(not working yet)
@@ -29,6 +29,13 @@
 // often with this vector
 /////////////////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////////////////////////////
+//logs
+//
+//Pinnded vecroe 1.2 -> fixed some forwarding semantics problems
+//
+//
 
 #ifdef PINNED_VECTOR_BOUNDS_CHECK
 
@@ -51,20 +58,20 @@
 //code
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-	#define PINNED_VECTOR_WIN
+#define PINNED_VECTOR_WIN
 #elif defined(__linux__) && !defined(__ANDROID__)
-	#define PINNED_VECTOR_LINUX
+#define PINNED_VECTOR_LINUX
 #else
-	#error pinned vector supports only windows and linux
+#error pinned vector supports only windows and linux
 #endif
 
 
 
 #ifdef PINNED_VECTOR_WIN
-	#include <Windows.h>
+#include <Windows.h>
 #else
-	#include <sys/mman.h>
-	#include <stdio.h>
+#include <sys/mman.h>
+#include <stdio.h>
 #endif
 
 #include <assert.h>
@@ -73,32 +80,33 @@
 
 
 #ifdef PINNED_VECTOR_WIN
-	
-	#define PINNED_VECTOR_RESERVE_MEMORY(size)\
+
+#define PINNED_VECTOR_RESERVE_MEMORY(size)\
 			VirtualAlloc(0, (size), MEM_RESERVE, PAGE_READWRITE)
-	
-	#define PINNED_VECTOR_COMMIT_MEMORY(beg, size)\
+
+#define PINNED_VECTOR_COMMIT_MEMORY(beg, size)\
 			VirtualAlloc((beg), (size), MEM_COMMIT, PAGE_READWRITE)
-	
-	#define PINNED_VECTOR_FREE_MEMORY(beg)\
+
+#define PINNED_VECTOR_FREE_MEMORY(beg)\
 			VirtualFree((beg), 0, MEM_RELEASE)
 
 
 #else
 
 	//#define PINNED_VECTOR_RESERVE_MEMORY(size) mmap(nullptr, (size), PROT_NONE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0)
-	#define PINNED_VECTOR_RESERVE_MEMORY(size) mmap(nullptr, (size),  PROT_READ|PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0)
-	//#define PINNED_VECTOR_RESERVE_MEMORY(size) malloc(size)
-	
-	//#define PINNED_VECTOR_COMMIT_MEMORY(beg, size) true
-	//(mprotect((beg), (size), PROT_READ|PROT_WRITE)==0) && (mlock((beg), (size)) == 0)
-	#define PINNED_VECTOR_COMMIT_MEMORY(beg, size) \
-		(mprotect((beg), (size), PROT_READ|PROT_WRITE)==0) && (mlock((beg), (size)) == 0 && (((unsigned char*)beg)[size-1] = 0, 1))
-			
-	
-	#define PINNED_VECTOR_FREE_MEMORY(beg) munmap((beg), maxElCount*sizeof(T))
-	//#define PINNED_VECTOR_FREE_MEMORY(beg) ::free((void*)beg)
-			
+#define PINNED_VECTOR_RESERVE_MEMORY(size) mmap(nullptr, (size),  PROT_READ|PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0)
+//#define PINNED_VECTOR_RESERVE_MEMORY(size) malloc(size)
+
+//#define PINNED_VECTOR_COMMIT_MEMORY(beg, size) true
+//(mprotect((beg), (size), PROT_READ|PROT_WRITE)==0) && (mlock((beg), (size)) == 0)
+#define PINNED_VECTOR_COMMIT_MEMORY(beg, size) \
+		(mprotect((beg), (size), PROT_READ|PROT_WRITE)==0, 1)
+		//(mprotect((beg), (size), PROT_READ|PROT_WRITE)==0) && (mlock((beg), (size)) == 0 && (((unsigned char*)beg)[size-1] = 0, 1))
+
+
+#define PINNED_VECTOR_FREE_MEMORY(beg) munmap((beg), maxElCount*sizeof(T))
+//#define PINNED_VECTOR_FREE_MEMORY(beg) ::free((void*)beg)
+
 
 #endif
 
@@ -111,17 +119,17 @@ struct PinnedVector
 	T *beg_ = 0;
 	unsigned int size_ = 0;
 
-	typedef T* iterator;
-	typedef const T* constIterator;
+	typedef T *iterator;
+	typedef const T *constIterator;
 
-	iterator begin() { return &((T*)beg_)[0]; }
-	constIterator begin() const { return &((T*)beg_)[0]; }
-	iterator end() { return &((T*)beg_)[size_]; }
-	constIterator end() const { return &((T*)beg_)[size_]; }
+	iterator begin() { return &((T *)beg_)[0]; }
+	constIterator begin() const { return &((T *)beg_)[0]; }
+	iterator end() { return &((T *)beg_)[size_]; }
+	constIterator end() const { return &((T *)beg_)[size_]; }
 
 	static constexpr unsigned int maxSize = maxElCount;
-	
-	
+
+
 	PinnedVector()
 	{
 		initializeArena();
@@ -134,7 +142,7 @@ struct PinnedVector
 
 		other.size_ = 0;
 		other.beg_ = nullptr;
-	
+
 		//?
 		other.initializeArena();
 	}
@@ -155,7 +163,7 @@ struct PinnedVector
 
 	void reserve(size_t elementCount);
 
-	size_t size()const {return size_;}
+	size_t size()const { return size_; }
 
 	bool empty() const
 	{
@@ -165,7 +173,7 @@ struct PinnedVector
 
 	T *data();
 
-	PinnedVector &operator= (const PinnedVector& other)
+	PinnedVector &operator= (const PinnedVector &other)
 	{
 		if (this == &other)
 		{
@@ -179,9 +187,9 @@ struct PinnedVector
 		return *this;
 	}
 
-	PinnedVector &operator= (const PinnedVector&& other)
+	PinnedVector &operator= (const PinnedVector &&other)
 	{
-		if(this == &other)
+		if (this == &other)
 		{
 			return *this;
 		}
@@ -194,13 +202,13 @@ struct PinnedVector
 	T &operator[] (unsigned int index)
 	{
 		PINNED_VECTOR_ASSERT(index < size_);
-		return static_cast<T*>(beg_)[index];
+		return static_cast<T *>(beg_)[index];
 	}
 
 	T operator[] (unsigned int index) const
 	{
 		PINNED_VECTOR_ASSERT(index < size_);
-		return static_cast<T*>(beg_)[index];
+		return static_cast<T *>(beg_)[index];
 	}
 
 	void push_back(const T &el);
@@ -227,31 +235,31 @@ struct PinnedVector
 template<class T, unsigned int maxElCount>
 inline void PinnedVector<T, maxElCount>::initializeArena()
 {
-	if(beg_)
+	if (beg_)
 	{
 		free();
 	}
 
-	beg_ = (T*)PINNED_VECTOR_RESERVE_MEMORY(sizeof(T) * maxElCount);
-	PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(beg_ != 0 && beg_!=(void *) -1);
+	beg_ = (T *)PINNED_VECTOR_RESERVE_MEMORY(sizeof(T) * maxElCount);
+	PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(beg_ != 0 && beg_ != (void *)-1);
 
 }
 
 template<class T, unsigned int maxElCount>
 inline void PinnedVector<T, maxElCount>::noConstructorCallResize(size_t elementCount)
 {
-	if(!beg_)
+	if (!beg_)
 	{
 		initializeArena();
 	}
 
-	if(elementCount > size_)
+	if (elementCount > size_)
 	{
 		auto check = PINNED_VECTOR_COMMIT_MEMORY((beg_), (elementCount * sizeof(T)));
 		PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(check);
 		size_ = elementCount;
 	}
-	else 
+	else
 	{
 		size_ = elementCount;
 	}
@@ -271,7 +279,7 @@ inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
 		auto check = PINNED_VECTOR_COMMIT_MEMORY((beg_), (elementCount * sizeof(T)));
 		PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(check);
 
-		for(int i=size_; i<elementCount; i++)
+		for (int i = size_; i < elementCount; i++)
 		{
 			new(&beg_[i])T{};
 		}
@@ -279,14 +287,14 @@ inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
 	}
 	else
 	{
-		if constexpr(!std::is_trivially_destructible<T>::value)
+		if constexpr (!std::is_trivially_destructible<T>::value)
 		{
 			for (int i = elementCount; i < size_; i++)
 			{
 				beg_[i].~T();
 			}
 		}
-		
+
 		elementCount = size_;
 	}
 }
@@ -300,25 +308,25 @@ inline void PinnedVector<T, maxElCount>::reserve(size_t elementCount)
 }
 
 template<class T, unsigned int maxElCount>
-inline T * PinnedVector<T, maxElCount>::data()
+inline T *PinnedVector<T, maxElCount>::data()
 {
 	return beg_;
 }
 
 template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::push_back(const T & el)
+inline void PinnedVector<T, maxElCount>::push_back(const T &el)
 {
 	noConstructorCallResize(size_ + 1);
-	new(&beg_[size_ - 1])T(el);
-	//new(&beg_[size_ - 1])T(std::forward<T>(el));
+	//new(&beg_[size_ - 1])T(el);
+	new(&beg_[size_ - 1])T(std::forward<T>(el));
 }
 
 template<class T, unsigned int maxElCount>
 inline void PinnedVector<T, maxElCount>::push_back(T &&el)
 {
 	noConstructorCallResize(size_ + 1);
-	new(&beg_[size_ - 1])T(el);
-	//new(&beg_[size_ - 1])T(std::forward<T>(el));
+	//new(&beg_[size_ - 1])T(el);
+	new(&beg_[size_ - 1])T(std::forward<T>(el));
 
 }
 
@@ -343,7 +351,7 @@ inline void PinnedVector<T, maxElCount>::clear()
 			beg_[i].~T();
 		}
 	}
-	
+
 	size_ = 0;
 }
 
@@ -358,7 +366,7 @@ inline void PinnedVector<T, maxElCount>::free()
 			beg_[i].~T();
 		}
 	}
-	
+
 #ifdef PINNED_VECTOR_MEMORY_CHECK
 
 	if (beg_)
@@ -369,7 +377,7 @@ inline void PinnedVector<T, maxElCount>::free()
 	}
 
 #else
-	
+
 	if (beg_)
 	{
 		PINNED_VECTOR_FREE_MEMORY(beg_);

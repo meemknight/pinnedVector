@@ -14,8 +14,8 @@ int totalCounter = 0;
 struct Test
 {
 	Test() { counter++; totalCounter++; hasData = 1; a = 69; }
-	Test(Test &other) { counter++; totalCounter++; hasData = 1; a = 69; }
-	Test(Test &&other) { hasData = 1; other.hasData = 0; a = 69; }
+	Test(Test &other) { counter++; totalCounter++; hasData = other.hasData; a = 69; }
+	Test(Test &&other) noexcept { hasData = other.hasData; other.hasData = 0; a = 69; }
 
 	~Test() { if (hasData) { counter--; a = 69; hasData = 0; } }
 
@@ -29,7 +29,7 @@ struct Test
 		return *this;
 	}
 
-	Test &operator=(Test &&other)
+	Test &operator=(Test &&other) noexcept
 	{
 		if (this == &other) { return *this; }
 
@@ -105,7 +105,6 @@ int main()
 
 			Test t;
 			v.push_back(std::move(t));
-			v.push_back(std::move(t));
 		
 			v.pop_back();
 			v.pop_back();
@@ -134,7 +133,7 @@ int main()
 			v.push_back("test ------------------------------------------ --- ");
 			v.push_back("");
 			v.push_back({});
-			v.push_back({});
+			v.push_back(std::move(std::string("test long...........................................")));
 			v.push_back({});
 			v.push_back({});
 			v.pop_back();
