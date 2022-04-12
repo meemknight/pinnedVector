@@ -283,7 +283,6 @@ inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
 		{
 			new(&beg_[i])T{};
 		}
-		size_ = elementCount;
 	}
 	else
 	{
@@ -294,9 +293,10 @@ inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
 				beg_[i].~T();
 			}
 		}
-
-		elementCount = size_;
 	}
+
+	size_ = elementCount;
+
 }
 
 template<class T, unsigned int maxElCount>
