@@ -112,7 +112,8 @@
 
 
 //maxElCount is the maximum number of ELEMENTS that the vector can store.
-template <class T, unsigned int maxElCount = 120>
+
+template <class T>
 struct PinnedVector
 {
 
@@ -127,12 +128,9 @@ struct PinnedVector
 	iterator end() { return &((T *)beg_)[size_]; }
 	constIterator end() const { return &((T *)beg_)[size_]; }
 
-	static constexpr unsigned int maxSize = maxElCount;
-
-
-	PinnedVector()
+	PinnedVector(size_t maxElementCount = 1000)
 	{
-		initializeArena();
+		initializeArena(maxElementCount);
 	}
 
 	PinnedVector(PinnedVector &&other)
@@ -155,7 +153,7 @@ struct PinnedVector
 		memcpy(beg_, other.beg_, size_ * sizeof(T));
 	}
 
-	void initializeArena();
+	void initializeArena(size_t maxElementCount);
 
 	void noConstructorCallResize(size_t elementCount);
 
@@ -169,7 +167,6 @@ struct PinnedVector
 	{
 		return (size_ == 0);
 	}
-
 
 	T *data();
 
@@ -232,26 +229,26 @@ struct PinnedVector
 	~PinnedVector();
 };
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::initializeArena()
+template<class T>
+inline void PinnedVector<T>::initializeArena(size_t maxElementCount)
 {
 	if (beg_)
 	{
 		free();
 	}
 
-	beg_ = (T *)PINNED_VECTOR_RESERVE_MEMORY(sizeof(T) * maxElCount);
+	beg_ = (T *)PINNED_VECTOR_RESERVE_MEMORY(sizeof(T) * maxElementCount);
 	PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(beg_ != 0 && beg_ != (void *)-1);
 
 }
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::noConstructorCallResize(size_t elementCount)
+template<class T>
+inline void PinnedVector<T>::noConstructorCallResize(size_t elementCount)
 {
-	if (!beg_)
-	{
-		initializeArena();
-	}
+	//if (!beg_)
+	//{
+	//	initializeArena();
+	//}
 
 	if (elementCount > size_)
 	{
@@ -266,13 +263,13 @@ inline void PinnedVector<T, maxElCount>::noConstructorCallResize(size_t elementC
 
 }
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
+template<class T>
+inline void PinnedVector<T>::resize(size_t elementCount)
 {
-	if (!beg_)
-	{
-		initializeArena();
-	}
+	//if (!beg_)
+	//{
+	//	initializeArena();
+	//}
 
 	if (elementCount > size_)
 	{
@@ -299,30 +296,30 @@ inline void PinnedVector<T, maxElCount>::resize(size_t elementCount)
 
 }
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::reserve(size_t elementCount)
+template<class T>
+inline void PinnedVector<T>::reserve(size_t elementCount)
 {
 	auto check = PINNED_VECTOR_COMMIT_MEMORY((beg_), (elementCount * sizeof(T)));
 	PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(check);
 
 }
 
-template<class T, unsigned int maxElCount>
-inline T *PinnedVector<T, maxElCount>::data()
+template<class T>
+inline T *PinnedVector<T>::data()
 {
 	return beg_;
 }
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::push_back(const T &el)
+template<class T>
+inline void PinnedVector<T>::push_back(const T &el)
 {
 	noConstructorCallResize(size_ + 1);
 	//new(&beg_[size_ - 1])T(el);
 	new(&beg_[size_ - 1])T(std::forward<T>(el));
 }
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::push_back(T &&el)
+template<class T>
+inline void PinnedVector<T>::push_back(T &&el)
 {
 	noConstructorCallResize(size_ + 1);
 	//new(&beg_[size_ - 1])T(el);
@@ -330,8 +327,8 @@ inline void PinnedVector<T, maxElCount>::push_back(T &&el)
 
 }
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::pop_back()
+template<class T>
+inline void PinnedVector<T>::pop_back()
 {
 	if constexpr (!std::is_trivially_destructible<T>::value)
 	{
@@ -341,8 +338,8 @@ inline void PinnedVector<T, maxElCount>::pop_back()
 	noConstructorCallResize(size_ - 1);
 }
 
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::clear()
+template<class T>
+inline void PinnedVector<T>::clear()
 {
 	if constexpr (!std::is_trivially_destructible<T>::value)
 	{
@@ -356,8 +353,8 @@ inline void PinnedVector<T, maxElCount>::clear()
 }
 
 //todo add commited size_
-template<class T, unsigned int maxElCount>
-inline void PinnedVector<T, maxElCount>::free()
+template<class T>
+inline void PinnedVector<T>::free()
 {
 	if constexpr (!std::is_trivially_destructible<T>::value)
 	{
@@ -389,8 +386,8 @@ inline void PinnedVector<T, maxElCount>::free()
 
 }
 
-template<class T, unsigned int maxElCount>
-inline PinnedVector<T, maxElCount>::~PinnedVector()
+template<class T>
+inline PinnedVector<T>::~PinnedVector()
 {
 	free();
 }
