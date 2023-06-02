@@ -1,7 +1,7 @@
 #pragma once
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Pinned vector 1.2
+// Pinned vector 1.3
 // Define PINNED_VECTOR_MEMORY_CHECK to check if acces deleted memory areas (not working yet)
 // Define PINNED_VECTOR_BOUNDS_CHECK to check in bounds acces
 // https://github.com/meemknight/pinnedVector
@@ -34,6 +34,7 @@
 //logs
 //
 //Pinnded vecroe 1.2 -> fixed some forwarding semantics problems
+//Pinnded vecroe 1.3 -> moved max size from template to constructor
 //
 //
 
