@@ -8,6 +8,10 @@ Working on Windows and Linux
 
 ---
 
+Youtube video: https://youtu.be/p1EogAEktZ4
+
+---
+
 To intall the library use the cmake included in the pinnedVector folder or just copy the header into yout project.
 Cpp17 required.
 
