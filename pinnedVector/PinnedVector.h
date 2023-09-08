@@ -2,8 +2,8 @@
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Pinned vector 1.3
-// Define PINNED_VECTOR_MEMORY_CHECK to check if acces deleted memory areas (not working yet)
-// Define PINNED_VECTOR_BOUNDS_CHECK to check in bounds acces
+// Define PINNED_VECTOR_MEMORY_CHECK to check if access deleted memory areas (not working yet)
+// Define PINNED_VECTOR_BOUNDS_CHECK to check in bounds access
 // https://github.com/meemknight/pinnedVector
 // licensed under MIT license, do not remove this notice https://github.com/meemknight/pinnedVector/blob/master/LICENSE
 // Luta Vlad 2021
@@ -12,7 +12,7 @@
 
 /////////////////////////////////////////////
 //#define PINNED_VECTOR_BOUNDS_CHECK
-// It checks if you acces outside the array
+// It checks if you access outside the array
 /////////////////////////////////////////////
 #ifdef _DEBUG
 #define PINNED_VECTOR_BOUNDS_CHECK
@@ -22,10 +22,10 @@
 /////////////////////////////////////////////////////////////////////////////
 //#define PINNED_VECTOR_MEMORY_CHECK
 // 
-// this checks if you acces memory that was freed. 
-// I does not release memory, but rather ivalidates it so it would
-// fail on acces. Can consume a lot of memory due to this reason so use it 
-// only to debug and it can crash quickly if you allocate and deallocate 
+//This checks if you access memory that was freed. 
+// It does not release memory but rather invalidates it, so it would
+// fail on access. Can consume a lot of memory due to this reason so use it 
+// only to debug, and it can crash quickly if you allocate and deallocate 
 // often with this vector
 /////////////////////////////////////////////////////////////////////////////
 
@@ -33,15 +33,15 @@
 ////////////////////////////////////////////////////////////////////
 //logs
 //
-//Pinnded vecroe 1.2 -> fixed some forwarding semantics problems
-//Pinnded vecroe 1.3 -> moved max size from template to constructor
+//Pinnded vector 1.2 -> fixed some forwarding semantics problems
+//Pinnded vector 1.3 -> moved max size from template to constructor
 //
 //
 
 #ifdef PINNED_VECTOR_BOUNDS_CHECK
 
-//you can use your own assert function here if you want.
-//it is used to check if the vector gets out of bounds
+//You can use your own assert function here if you want.
+//It is used to check if the vector gets out of bounds
 #define PINNED_VECTOR_ASSERT(x) assert(x)
 
 #else
@@ -50,7 +50,7 @@
 
 #endif
 
-//you can use your own assert function here if you want.
+//You can use your own assert function here if you want.
 //it is used to check if the allocations fail
 #define PINNED_VECTOR_ALLOCATION_FAILED_ASSERT(x) assert(x)
 
