@@ -72,11 +72,14 @@
 #include <Windows.h>
 #else
 #include <sys/mman.h>
-#include <stdio.h>
+#include <cstdio>
 #endif
 
-#include <assert.h>
+#include <cassert>
+#include <cstdint>
+#include <limits>
 #include <type_traits>
+
 
 
 
@@ -104,8 +107,7 @@
 		(mprotect((beg), (size), PROT_READ|PROT_WRITE)==0, 1)
 		//(mprotect((beg), (size), PROT_READ|PROT_WRITE)==0) && (mlock((beg), (size)) == 0 && (((unsigned char*)beg)[size-1] = 0, 1))
 
-
-#define PINNED_VECTOR_FREE_MEMORY(beg) munmap((beg), maxElCount*sizeof(T))
+#define PINNED_VECTOR_FREE_MEMORY(beg) munmap((beg), std::numeric_limits<uint64_t>::max()*sizeof(T))
 //#define PINNED_VECTOR_FREE_MEMORY(beg) ::free((void*)beg)
 
 
@@ -193,7 +195,16 @@ struct PinnedVector
 		}
 
 		free();
-		this(std::move(other));
+		
+		this->beg_ = other.beg_;
+		this->size_ = other.size_;
+
+		other.size_ = 0;
+		other.beg_ = nullptr;
+
+		//?
+		other.initializeArena();
+
 		return *this;
 	}
 
