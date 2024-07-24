@@ -12,7 +12,7 @@ Youtube video: https://youtu.be/p1EogAEktZ4
 
 ---
 
-To intall the library use the cmake included in the pinnedVector folder or just copy the header into yout project.
+To install the library use the cmake included in the pinnedVector folder or just copy the header into your project.
 Cpp17 required.
 
 ---

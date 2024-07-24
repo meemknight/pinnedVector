@@ -2,8 +2,8 @@
 
 // //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Pinned vector 1.3
-// Define PINNED_VECTOR_MEMORY_CHECK to check if acces deleted memory areas (not working yet)
-// Define PINNED_VECTOR_BOUNDS_CHECK to check in bounds acces
+// Define PINNED_VECTOR_MEMORY_CHECK to check if access deleted memory areas (not working yet)
+// Define PINNED_VECTOR_BOUNDS_CHECK to check in bounds access
 // https://github.com/meemknight/pinnedVector
 // licensed under MIT license, do not remove this notice https://github.com/meemknight/pinnedVector/blob/master/LICENSE
 // Luta Vlad 2021
@@ -12,7 +12,7 @@
 
 /////////////////////////////////////////////
 //#define PINNED_VECTOR_BOUNDS_CHECK
-// It checks if you acces outside the array
+// It checks if you access outside the array
 /////////////////////////////////////////////
 #ifdef _DEBUG
 #define PINNED_VECTOR_BOUNDS_CHECK
@@ -21,11 +21,11 @@
 //(not working yet)
 /////////////////////////////////////////////////////////////////////////////
 //#define PINNED_VECTOR_MEMORY_CHECK
-// 
-// this checks if you acces memory that was freed. 
+//
+// this checks if you access memory that was freed.
 // I does not release memory, but rather ivalidates it so it would
-// fail on acces. Can consume a lot of memory due to this reason so use it 
-// only to debug and it can crash quickly if you allocate and deallocate 
+// fail on access. Can consume a lot of memory due to this reason so use it
+// only to debug and it can crash quickly if you allocate and deallocate
 // often with this vector
 /////////////////////////////////////////////////////////////////////////////
 
@@ -33,8 +33,8 @@
 ////////////////////////////////////////////////////////////////////
 //logs
 //
-//Pinnded vecroe 1.2 -> fixed some forwarding semantics problems
-//Pinnded vecroe 1.3 -> moved max size from template to constructor
+//Pinned Vector 1.2 -> fixed some forwarding semantics problems
+//Pinned Vector 1.3 -> moved max size from template to constructor
 //
 //
 
@@ -46,7 +46,7 @@
 
 #else
 
-#define PINNED_VECTOR_ASSERT(x) 
+#define PINNED_VECTOR_ASSERT(x)
 
 #endif
 
@@ -353,7 +353,7 @@ inline void PinnedVector<T>::clear()
 	size_ = 0;
 }
 
-//todo add commited size_
+//todo add committed size_
 template<class T>
 inline void PinnedVector<T>::free()
 {
@@ -396,6 +396,6 @@ inline PinnedVector<T>::~PinnedVector()
 
 #undef PINNED_VECTOR_WIN
 #undef PINNED_VECTOR_LINUX
-#undef PINNED_VECTOR_RESERVE_MEMORY	
+#undef PINNED_VECTOR_RESERVE_MEMORY
 #undef PINNED_VECTOR_COMMIT_MEMORY
 #undef PINNED_VECTOR_FREE_MEMORY
